@@ -43,6 +43,16 @@ ffbuild_dockerbuild() {
     meson "${myconf[@]}" ..
     ninja -j$(nproc)
     ninja install
+
+    # its SVM part is C++: a static libvmaf links its runtime too
+    local cxx=-lstdc++
+    [[ $TARGET == mac* ]] && cxx=-lc++
+    local pc="$FFBUILD_PREFIX"/lib/pkgconfig/libvmaf.pc
+    if grep -q '^Libs.private:' "$pc"; then
+        sed -i.bak "s/^Libs.private:.*/& $cxx/" "$pc"
+    else
+        echo "Libs.private: $cxx" >> "$pc"
+    fi
 }
 
 ffbuild_configure() {

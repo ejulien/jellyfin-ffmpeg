@@ -15,7 +15,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-nasm"
              "${MINGW_PACKAGE_PREFIX}-pkgconf"
-             "xxd")
+             "vim")
 source=("https://github.com/Netflix/${_realname}/archive/v${pkgver}/${_realname}-${pkgver}.tar.gz")
 sha256sums=('5df7386911bc15fd1ca783132528748d219768ae4fc5f8e0b61184f041648092')
 
@@ -48,6 +48,14 @@ package() {
   cd "${srcdir}/build-${MSYSTEM}"
 
   DESTDIR="${pkgdir}" ${MINGW_TOOLCHAIN_PREFIX}/bin/meson install
+
+  # its SVM part is C++: a static libvmaf links its runtime too
+  local pc="${pkgdir}${FF_MINGW_PREFIX}/lib/pkgconfig/libvmaf.pc"
+  if grep -q '^Libs.private:' "${pc}"; then
+    sed -i 's/^Libs.private:.*/& -lc++/' "${pc}"
+  else
+    echo "Libs.private: -lc++" >> "${pc}"
+  fi
 
   install -Dm644 "${srcdir}/${_realname}-${pkgver}/LICENSE" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
 }
