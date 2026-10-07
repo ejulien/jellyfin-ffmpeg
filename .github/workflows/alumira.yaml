@@ -1,0 +1,54 @@
+name: 'Alumira FFmpeg'
+
+# jellyfin-ffmpeg with VMAF, for Alumira: the Ubuntu packages its Docker
+# image installs, and the portable builds its desktop apps carry. A tag
+# (v8.1.3-1-alumira1…) builds them all and attaches them to its release;
+# a manual run builds them only.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*-alumira*'
+
+permissions:
+  contents: write
+
+jobs:
+  ubuntu:
+    uses: ./.github/workflows/_meta.yaml
+    with:
+      distro: 'ubuntu'
+      codenames: '["resolute"]'
+      architectures: '["amd64", "arm64"]'
+      release: false
+
+  windows:
+    uses: ./.github/workflows/_meta_win_clang_portable.yaml
+    with:
+      release: false
+
+  mac:
+    uses: ./.github/workflows/_meta_mac_portable.yaml
+    with:
+      release: false
+
+  release:
+    name: Attach to the release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [ubuntu, windows, mac]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: dist
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          find dist -type f \( -name '*.deb' -o -name '*.zip' -o -name '*.tar.xz' -o -name '*.tar.gz' \) > files.txt
+          cat files.txt
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "jellyfin-ffmpeg with VMAF, for Alumira."
+          xargs -a files.txt gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber

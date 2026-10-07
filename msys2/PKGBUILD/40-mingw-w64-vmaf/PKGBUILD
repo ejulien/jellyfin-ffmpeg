@@ -1,0 +1,53 @@
+# Alumira: VMAF for the quality measurements of encodes (libvmaf filter)
+
+_realname=vmaf
+pkgbase=mingw-w64-jellyfin-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}")
+pkgver=3.2.1
+pkgrel=1
+pkgdesc="Perceptual video quality assessment algorithm based on multi-method fusion (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw64' 'ucrt64' 'clang64' 'clangarm64')
+url='https://github.com/Netflix/vmaf/'
+license=('spdx:BSD-2-Clause')
+makedepends=("${MINGW_PACKAGE_PREFIX}-cc"
+             "${MINGW_PACKAGE_PREFIX}-meson"
+             "${MINGW_PACKAGE_PREFIX}-ninja"
+             "${MINGW_PACKAGE_PREFIX}-nasm"
+             "${MINGW_PACKAGE_PREFIX}-pkgconf"
+             "xxd")
+source=("https://github.com/Netflix/${_realname}/archive/v${pkgver}/${_realname}-${pkgver}.tar.gz")
+sha256sums=('5df7386911bc15fd1ca783132528748d219768ae4fc5f8e0b61184f041648092')
+
+export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
+export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+build() {
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  LDFLAGS+=" -lpthread" \
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
+    ${MINGW_TOOLCHAIN_PREFIX}/bin/meson setup \
+      --prefix=${FF_MINGW_PREFIX} \
+      --default-library static \
+      --buildtype release \
+      -Denable_tests=false \
+      -Denable_docs=false \
+      -Dbuilt_in_models=true \
+      -Denable_float=true \
+      ../${_realname}-${pkgver}/libvmaf
+
+  ${MINGW_TOOLCHAIN_PREFIX}/bin/meson compile
+}
+
+check() {
+  :
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+
+  DESTDIR="${pkgdir}" ${MINGW_TOOLCHAIN_PREFIX}/bin/meson install
+
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/LICENSE" "${pkgdir}${FF_MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+}

@@ -308,6 +308,24 @@ prepare_extra_common() {
     popd
     popd
 
+    # LIBVMAF (Alumira: the quality measurements of encodes)
+    pushd ${SOURCE_DIR}
+    git clone -b v3.2.1 --depth=1 https://github.com/Netflix/vmaf.git
+    meson setup vmaf/libvmaf vmaf_build \
+        ${MESON_CROSS_OPT} \
+        --prefix=${TARGET_DIR} \
+        --libdir=lib \
+        --buildtype=release \
+        -Ddefault_library=shared \
+        -Denable_{tests,docs}=false \
+        -Dbuilt_in_models=true \
+        -Denable_float=true
+    ninja -j$(nproc) -C vmaf_build install
+    mkdir -p ${SOURCE_DIR}/vmaf_libs
+    cp -a ${TARGET_DIR}/lib/libvmaf.so* ${SOURCE_DIR}/vmaf_libs
+    echo "vmaf_libs/libvmaf.so* usr/lib/jellyfin-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    popd
+
     # FDK-AAC-STRIPPED
     pushd ${SOURCE_DIR}
     mkdir fdk-aac-stripped

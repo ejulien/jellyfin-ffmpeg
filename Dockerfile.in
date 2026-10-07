@@ -30,7 +30,7 @@ RUN apt-get update \
  && apt-get install -y apt-transport-https \
     curl ninja-build debhelper gnupg wget devscripts \
     mmv equivs git nasm pkg-config subversion dh-autoreconf \
-    python3-pip zip unzip tar flex bison gperf ragel \
+    python3-pip zip unzip tar flex bison gperf ragel xxd \
  && apt-get clean autoclean -y \
  && apt-get autoremove -y
 

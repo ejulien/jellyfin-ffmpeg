@@ -82,6 +82,7 @@ PKG_CONFIG_PATH=/clangarm64/ffbuild/lib/pkgconfig ./configure \
     --enable-libx265 \
     --enable-libsvtav1 \
     --enable-libdav1d \
+    --enable-libvmaf \
     --enable-libfdk-aac \
     --enable-libshaderc \
     --enable-libplacebo \
