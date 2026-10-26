@@ -4,7 +4,7 @@ _realname=vmaf
 pkgbase=mingw-w64-jellyfin-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-jellyfin-${_realname}")
 pkgver=3.2.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Perceptual video quality assessment algorithm based on multi-method fusion (mingw-w64)"
 arch=('any')
 mingw_arch=('mingw64' 'ucrt64' 'clang64' 'clangarm64')
@@ -21,6 +21,12 @@ sha256sums=('5df7386911bc15fd1ca783132528748d219768ae4fc5f8e0b61184f041648092')
 
 export MINGW_TOOLCHAIN_PREFIX="${MINGW_PREFIX}"
 export FF_MINGW_PREFIX="${MINGW_TOOLCHAIN_PREFIX}/ffbuild"
+
+# libsvm's own swap (svm.cpp) renamed: newer libc++ finds it beside std::swap
+# inside <vector> ("call to 'swap' is ambiguous")
+prepare() {
+  sed -E -i 's/(^|[^_a-zA-Z0-9:.>])swap\(/\1svm_swap(/g' "${srcdir}/${_realname}-${pkgver}/libvmaf/src/svm.cpp"
+}
 
 build() {
   mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"

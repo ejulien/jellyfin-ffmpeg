@@ -13,6 +13,10 @@ ffbuild_dockerbuild() {
     git clone --depth 1 --branch "$SCRIPT_COMMIT" "$SCRIPT_REPO" vmaf
     cd vmaf/libvmaf
 
+    # libsvm's own swap (svm.cpp) renamed: newer libc++ finds it beside std::swap
+    # inside <vector> ("call to 'swap' is ambiguous")
+    sed -E -i.bak 's/(^|[^_a-zA-Z0-9:.>])swap\(/\1svm_swap(/g' src/svm.cpp
+
     mkdir build && cd build
 
     local myconf=(
