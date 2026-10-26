@@ -4,9 +4,9 @@ SCRIPT_REPO="https://gitlab.freedesktop.org/wtaymans/fdk-aac-stripped.git"
 SCRIPT_COMMIT="529b87452cd33d45e1d0a5066d20b64f10b38845"
 
 ffbuild_enabled() {
-    # Prefer AudioToolbox's AAC encoder on macOS
-    [[ $TARGET == mac* ]] && return -1
-    return 0
+    # Off for Alumira: Fraunhofer's licence is not compatible with the GPL
+    # these builds are under (Alumira encodes with FFmpeg's own AAC)
+    return -1
 }
 
 ffbuild_dockerbuild() {

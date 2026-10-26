@@ -1,6 +1,7 @@
 name: 'Alumira FFmpeg'
 
-# jellyfin-ffmpeg with VMAF, for Alumira: the Ubuntu packages its Docker
+# jellyfin-ffmpeg with VMAF and without libfdk-aac (Fraunhofer's licence is
+# not compatible with the GPL), for Alumira: the Ubuntu packages its Docker
 # image installs, and the portable builds its desktop apps carry. A tag
 # (v8.1.3-1-alumira1…) builds them all and attaches them to its release;
 # a manual run builds them only.
@@ -50,5 +51,5 @@ jobs:
           find dist -type f \( -name '*.deb' -o -name '*.zip' -o -name '*.tar.xz' -o -name '*.tar.gz' \) > files.txt
           cat files.txt
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "jellyfin-ffmpeg with VMAF, for Alumira."
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes "jellyfin-ffmpeg with VMAF and without libfdk-aac, for Alumira."
           xargs -a files.txt gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber

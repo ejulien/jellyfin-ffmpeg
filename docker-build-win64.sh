@@ -481,21 +481,6 @@ meson setup dav1d dav1d_build \
 meson configure dav1d_build
 ninja -j$(nproc) -C dav1d_build install
 
-# FDK-AAC-STRIPPED
-git clone -b stripped5 --depth=1 https://gitlab.freedesktop.org/wtaymans/fdk-aac-stripped.git
-pushd fdk-aac-stripped
-./autogen.sh
-./configure \
-    --prefix=${FF_DEPS_PREFIX} \
-    --host=${FF_TOOLCHAIN} \
-    --disable-{silent-rules,shared} \
-    --enable-static \
-    CFLAGS="-O3 -DNDEBUG" \
-    CXXFLAGS="-O3 -DNDEBUG"
-make -j$(nproc)
-make install
-popd
-
 # OpenCL headers
 git clone -b v2023.04.17 --depth=1 https://github.com/KhronosGroup/OpenCL-Headers.git
 pushd OpenCL-Headers/CL
@@ -619,7 +604,6 @@ fi
     --enable-libx265 \
     --enable-libsvtav1 \
     --enable-libdav1d \
-    --enable-libfdk-aac \
     --enable-opencl \
     --enable-dxva2 \
     --enable-d3d11va \

@@ -49,7 +49,6 @@ CONFIG := --prefix=${TARGET_DIR} \
 	--enable-libx265 \
 	--enable-libzvbi \
 	--enable-libzimg \
-	--enable-libfdk-aac \
 	--enable-libshaderc \
 	--enable-libplacebo \
 	--enable-vulkan \

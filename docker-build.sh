@@ -326,25 +326,6 @@ prepare_extra_common() {
     echo "vmaf_libs/libvmaf.so* usr/lib/jellyfin-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 
-    # FDK-AAC-STRIPPED
-    pushd ${SOURCE_DIR}
-    mkdir fdk-aac-stripped
-    pushd fdk-aac-stripped
-    fdk_aac_ver="stripped5"
-    fdk_aac_link="https://gitlab.freedesktop.org/wtaymans/fdk-aac-stripped/-/archive/${fdk_aac_ver}/fdk-aac-stripped-${fdk_aac_ver}.tar.gz"
-    wget ${fdk_aac_link} -O fdk-aac-stripped.tar.gz
-    tar xaf fdk-aac-stripped.tar.gz
-    pushd fdk-aac-stripped-${fdk_aac_ver}
-    ./autogen.sh
-    ./configure \
-        --disable-{static,silent-rules} \
-        --prefix=${TARGET_DIR} CFLAGS="-O3 -DNDEBUG" CXXFLAGS="-O3 -DNDEBUG" ${CROSS_OPT}
-    make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/fdk-aac-stripped
-    echo "fdk-aac-stripped${TARGET_DIR}/lib/libfdk-aac.so* usr/lib/jellyfin-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
-    popd
-    popd
-    popd
-
     # FFNVCODEC
     pushd ${SOURCE_DIR}
     git clone -b n12.0.16.1 --depth=1 https://github.com/FFmpeg/nv-codec-headers.git
